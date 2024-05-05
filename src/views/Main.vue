@@ -3,7 +3,7 @@
         <el-aside style="width: 200px">
             <SideBar title="数字人控制器" :menu-items="menuItems"></SideBar>
         </el-aside>
-        <el-main style="background-color: var(--el-bg-color-page)">
+        <el-main id="main-wrap">
             <RouterView></RouterView>
         </el-main>
     </el-container>
@@ -45,5 +45,9 @@ export default {
     font-size: 24px;
     padding: 15px;
     padding-bottom: 20px;
+}
+#main-wrap {
+    background-color: var(--el-bg-color-page);
+    margin: 0;
 }
 </style>

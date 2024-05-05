@@ -20,12 +20,17 @@
             </div>
         </div>
 
-        <p id="copy-right">© 2024 SSE Digital Man</p>
+        <copy-right></copy-right>
     </div>
 </template>
 
 <script lang="ts">
+import CopyRight from "../components/CopyRight.vue";
+
 export default {
+    components: {
+        CopyRight,
+    },
     data() {
         return {
             loginInfo: {
@@ -63,10 +68,6 @@ export default {
 #sub-title {
     font-size: 24px;
     color: var(--el-color-primary);
-}
-#copy-right {
-    color: var(--el-color-white);
-    font-size: 12px;
 }
 #login-wrap {
     width: 400px;

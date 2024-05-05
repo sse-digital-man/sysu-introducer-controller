@@ -1,5 +1,5 @@
 <template>
-    <RouterView></RouterView>
+    <a>not found</a>
 </template>
 
 <script lang="ts">

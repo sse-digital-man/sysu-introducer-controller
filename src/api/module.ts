@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getApiUrl, getRequest, postRequest } from "./utils";
+import { ModuleStatus } from "../info/status";
 
 const BOOTER = "booter";
 
@@ -15,9 +16,17 @@ export const moduleControlApi = {
     async getModuleStatus(name: string) {
         let request = getRequest(getApiUrl(`module/${name}/status`), undefined);
 
-        return await axios(request).then((resp) => {
-            return resp.data;
-        });
+        return await axios(request)
+            .then((resp) => {
+                return resp.data;
+            })
+            .catch(() => {
+                return {
+                    info: {
+                        status: ModuleStatus.NotConnected,
+                    },
+                };
+            });
     },
 
     // BOOTER 代表整个数字人系统，以下 API 用于整体控制

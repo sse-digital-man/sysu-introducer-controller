@@ -8,7 +8,7 @@
                 <span style="margin-left: 8px" :style="{ color: statusColor }">{{ status ? "运行中" : "停止中" }}</span>
             </div> -->
             <div class="control-wrap">
-                <el-button color="var(--el-color-info-light-9)" @click="click()" :loading="isLoading" circle>
+                <el-button @click="click()" :loading="isLoading" :disabled="status.disabled" circle>
                     <template #icon>
                         <SvgIcon :name="status.icon" :size="24" :color="status.color" />
                     </template>
@@ -53,6 +53,7 @@ export default {
                 value: ModuleStatus.Stopping,
                 color: "",
                 icon: "",
+                disabled: true,
             },
             url: new URL("../../assets/image.png", import.meta.url).href,
 
@@ -77,6 +78,7 @@ export default {
         updateStatus(newStatus: ModuleStatus) {
             let icon = "";
             let color = "";
+            let disabled = false;
             switch (newStatus) {
                 case ModuleStatus.Started:
                     color = "red";
@@ -91,15 +93,19 @@ export default {
                     color = "gray";
                     icon = "refresh";
                     break;
+                case ModuleStatus.NotConnected:
+                    color = "red";
+                    icon = "x";
+                    disabled = true;
+                    break;
             }
 
             this.status = {
                 value: newStatus,
                 color,
                 icon,
+                disabled,
             };
-
-            // console.log(this.status);
         },
     },
     computed: {

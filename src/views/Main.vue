@@ -49,5 +49,7 @@ export default {
 #main-wrap {
     background-color: var(--el-bg-color-page);
     margin: 0;
+
+    overflow-x: hidden;
 }
 </style>

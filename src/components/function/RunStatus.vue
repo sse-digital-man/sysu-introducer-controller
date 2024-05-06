@@ -1,5 +1,5 @@
 <template>
-    <FunctionLayout title="运行状态" style="width: 400px">
+    <FunctionLayout title="运行状态">
         <div id="content-wrap">
             <div style="margin-bottom: 100px">当前角色: {{ curRole }}</div>
 

@@ -1,8 +1,9 @@
 <template>
     <div class="col-wrap">
         <div class="row-wrap">
-            <RunStatus></RunStatus>
-            <ModuleControl style="margin-left: 20px"></ModuleControl>
+            <!-- Notice: 需要给两块地方单独设置一下占比 以解决宽度溢出的问题 -->
+            <RunStatus style="width: 30%"></RunStatus>
+            <ModuleControl style="width: 70%; margin-left: 20px"></ModuleControl>
         </div>
         <div class="row-wrap" style="height: 100%">
             <ModuleConfig></ModuleConfig>

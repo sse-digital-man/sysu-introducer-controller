@@ -39,7 +39,7 @@ import FunctionLayout from "../layout/FunctionLayout.vue";
 import SvgIcon from "../SvgIcon.vue";
 
 import { statusLabel, ModuleStatus } from "../../info/status";
-import { startModule, stopModule } from "../../api/module";
+import { moduleControlApi } from "../../api/module";
 
 export default {
     components: {
@@ -63,12 +63,16 @@ export default {
         click() {
             switch (this.status.value) {
                 case ModuleStatus.Stopped:
-                    startModule("all");
+                    moduleControlApi.boot();
                     break;
                 case ModuleStatus.Started:
-                    stopModule("all");
+                    moduleControlApi.shutDown();
                     break;
             }
+        },
+        async initStatus() {
+            const status = await moduleControlApi.getStatus();
+            this.updateStatus(status.info.status);
         },
         updateStatus(newStatus: ModuleStatus) {
             let icon = "";
@@ -104,8 +108,9 @@ export default {
             return status == ModuleStatus.Starting || status == ModuleStatus.Stopping;
         },
     },
-    mounted() {
-        this.updateStatus(ModuleStatus.Stopped);
+    async mounted() {
+        //初始化更新当前状态
+        await this.initStatus();
 
         window.ws.addEventListener("message", (event) => {
             const data = JSON.parse(event.data);

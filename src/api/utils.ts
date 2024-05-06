@@ -23,14 +23,14 @@ export function deleteRequest(apiUrl: string, data: any) {
 }
 
 export function putRequest(apiUrl: string, data: any) {
-    return axios({
+    return {
         method: "put",
         url: apiUrl,
         headers: {
             "Content-Type": "application/json",
         },
         data: data,
-    });
+    };
 }
 
 export function getRequest(apiUrl: string, params: any): AxiosRequestConfig {

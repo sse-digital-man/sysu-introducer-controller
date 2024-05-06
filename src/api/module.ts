@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getApiUrl, getRequest, postRequest } from "./utils";
+import { getApiUrl, getRequest, postRequest, putRequest } from "./utils";
 import { ModuleStatus } from "../info/status";
 
 const BOOTER = "booter";
@@ -52,5 +52,34 @@ export const moduleControlApi = {
         return await axios(request).then((resp) => {
             return resp.data;
         });
+    },
+
+    async getAllModuleList() {
+        let request = getRequest(getModuleApiUrl(`list/all`), undefined);
+
+        return await axios(request).then((resp) => {
+            return resp.data;
+        });
+    },
+
+    async getModuleConfig(name: string) {
+        let request = getRequest(getModuleApiUrl(`config/${name}`), undefined);
+
+        return await axios(request)
+            .then((resp) => {
+                return resp.data;
+            })
+            .catch(() => {
+                return undefined;
+            });
+    },
+
+    updateModuleConfig(name: string, kind: string, content: any) {
+        let request = putRequest(getModuleApiUrl(`config/${name}`), {
+            kind: kind,
+            content: content,
+        });
+
+        axios(request);
     },
 };

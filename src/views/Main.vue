@@ -27,6 +27,12 @@ export default {
         };
     },
     methods: {},
+    created() {
+        // 进入主界面的时候 将 websocket 挂载在 window 上
+        const ws = new WebSocket("ws://127.0.0.1:8083");
+        ws.onopen = () => console.log("connected");
+        window.ws = ws;
+    },
 };
 </script>
 

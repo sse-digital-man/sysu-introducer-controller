@@ -8,10 +8,20 @@
                 <span style="margin-left: 8px" :style="{ color: statusColor }">{{ status ? "运行中" : "停止中" }}</span>
             </div> -->
             <div class="control-wrap">
-                <el-button color="var(--el-color-info-light-9)" @click="changeStatus()" circle>
-                    <SvgIcon name="play" :size="24" color="green" />
+                <el-button color="var(--el-color-info-light-9)" @click="click()" :loading="isLoading" circle>
+                    <template #icon>
+                        <SvgIcon :name="status.icon" :size="24" :color="status.color" />
+                    </template>
+                    <template #loading>
+                        <SvgIcon
+                            name="refresh"
+                            :size="24"
+                            style="animation: loading-rotate 2s linear infinite"
+                            :color="status.color"
+                        />
+                    </template>
                 </el-button>
-                <span>{{ statusLabel[status] }}</span>
+                <span>{{ statusLabel[status.value] }}</span>
             </div>
             <!-- <div class="control-wrap">
                     <el-button color="var(--el-color-info-light-5)" circle>
@@ -28,6 +38,9 @@
 import FunctionLayout from "../layout/FunctionLayout.vue";
 import SvgIcon from "../SvgIcon.vue";
 
+import { statusLabel, ModuleStatus } from "../../info/status";
+import { startModule, stopModule } from "../../api/module";
+
 export default {
     components: {
         FunctionLayout,
@@ -36,22 +49,73 @@ export default {
     data() {
         return {
             curRole: "中小大",
-            status: 0,
-
-            statusLabel: ["未运行", "启动中", "运行中", "停止中"] as string[],
-
+            status: {
+                value: ModuleStatus.Stopping,
+                color: "",
+                icon: "",
+            },
             url: new URL("../../assets/image.png", import.meta.url).href,
+
+            statusLabel,
         };
     },
     methods: {
-        changeStatus() {
-            this.status = (this.status + 1) % 4;
+        click() {
+            switch (this.status.value) {
+                case ModuleStatus.Stopped:
+                    startModule("all");
+                    break;
+                case ModuleStatus.Started:
+                    stopModule("all");
+                    break;
+            }
+        },
+        updateStatus(newStatus: ModuleStatus) {
+            let icon = "";
+            let color = "";
+            switch (newStatus) {
+                case ModuleStatus.Started:
+                    color = "red";
+                    icon = "pause";
+                    break;
+                case ModuleStatus.Stopped:
+                    color = "green";
+                    icon = "play";
+                    break;
+                case ModuleStatus.Starting:
+                case ModuleStatus.Stopping:
+                    color = "gray";
+                    icon = "refresh";
+                    break;
+            }
+
+            this.status = {
+                value: newStatus,
+                color,
+                icon,
+            };
+
+            // console.log(this.status);
         },
     },
     computed: {
-        statusColor(): string {
-            return this.status ? "green" : "red";
+        isLoading(): boolean {
+            const status = this.status.value;
+            return status == ModuleStatus.Starting || status == ModuleStatus.Stopping;
         },
+    },
+    mounted() {
+        this.updateStatus(ModuleStatus.Stopped);
+
+        window.ws.addEventListener("message", (event) => {
+            const data = JSON.parse(event.data);
+
+            if (data.name != "booter") return;
+
+            // console.log(data);
+            // this.status = data["status"];
+            this.updateStatus(data["status"]);
+        });
     },
 };
 </script>

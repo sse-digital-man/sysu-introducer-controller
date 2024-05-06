@@ -8,20 +8,8 @@
                 <span style="margin-left: 8px" :style="{ color: statusColor }">{{ status ? "运行中" : "停止中" }}</span>
             </div> -->
             <div class="control-wrap">
-                <el-button @click="click()" :loading="isLoading" :disabled="status.disabled" circle>
-                    <template #icon>
-                        <SvgIcon :name="status.icon" :size="24" :color="status.color" />
-                    </template>
-                    <template #loading>
-                        <SvgIcon
-                            name="refresh"
-                            :size="24"
-                            style="animation: loading-rotate 2s linear infinite"
-                            :color="status.color"
-                        />
-                    </template>
-                </el-button>
-                <span>{{ statusLabel[status.value] }}</span>
+                <ModuleControlButton :status="status" :click="click"></ModuleControlButton>
+                <span>{{ statusLabel[status] }}</span>
             </div>
             <!-- <div class="control-wrap">
                     <el-button color="var(--el-color-info-light-5)" circle>
@@ -36,7 +24,7 @@
 
 <script lang="ts">
 import FunctionLayout from "../layout/FunctionLayout.vue";
-import SvgIcon from "../SvgIcon.vue";
+import ModuleControlButton from "../ModuleControlButton.vue";
 
 import { statusLabel, ModuleStatus } from "../../info/status";
 import { moduleControlApi } from "../../api/module";
@@ -44,17 +32,12 @@ import { moduleControlApi } from "../../api/module";
 export default {
     components: {
         FunctionLayout,
-        SvgIcon,
+        ModuleControlButton,
     },
     data() {
         return {
             curRole: "中小大",
-            status: {
-                value: ModuleStatus.Stopping,
-                color: "",
-                icon: "",
-                disabled: true,
-            },
+            status: ModuleStatus.NotConnected,
             url: new URL("../../assets/image.png", import.meta.url).href,
 
             statusLabel,
@@ -62,7 +45,7 @@ export default {
     },
     methods: {
         click() {
-            switch (this.status.value) {
+            switch (this.status) {
                 case ModuleStatus.Stopped:
                     moduleControlApi.boot();
                     break;
@@ -72,61 +55,17 @@ export default {
             }
         },
         async initStatus() {
-            const status = await moduleControlApi.getStatus();
-            this.updateStatus(status.info.status);
-        },
-        updateStatus(newStatus: ModuleStatus) {
-            let icon = "";
-            let color = "";
-            let disabled = false;
-            switch (newStatus) {
-                case ModuleStatus.Started:
-                    color = "red";
-                    icon = "pause";
-                    break;
-                case ModuleStatus.Stopped:
-                    color = "green";
-                    icon = "play";
-                    break;
-                case ModuleStatus.Starting:
-                case ModuleStatus.Stopping:
-                    color = "gray";
-                    icon = "refresh";
-                    break;
-                case ModuleStatus.NotConnected:
-                    color = "red";
-                    icon = "x";
-                    disabled = true;
-                    break;
-            }
-
-            this.status = {
-                value: newStatus,
-                color,
-                icon,
-                disabled,
-            };
-        },
-    },
-    computed: {
-        isLoading(): boolean {
-            const status = this.status.value;
-            return status == ModuleStatus.Starting || status == ModuleStatus.Stopping;
+            const resp = await moduleControlApi.getStatus();
+            this.status = resp.info.status;
         },
     },
     async mounted() {
-        //初始化更新当前状态
-        await this.initStatus();
-
         window.ws.addEventListener("message", (event) => {
             const data = JSON.parse(event.data);
-
-            if (data.name != "booter") return;
-
-            // console.log(data);
-            // this.status = data["status"];
-            this.updateStatus(data["status"]);
+            if (data.name == "booter") this.status = data["status"];
         });
+        //初始化更新当前状态
+        await this.initStatus();
     },
 };
 </script>

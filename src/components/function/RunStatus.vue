@@ -1,5 +1,5 @@
 <template>
-    <FunctionLayout title="运行状态">
+    <FunctionLayout title="运行状态" style="width: 400px">
         <div id="content-wrap">
             <div style="margin-bottom: 100px">当前角色: {{ curRole }}</div>
 
@@ -26,13 +26,11 @@
 
 <script lang="ts">
 import FunctionLayout from "../layout/FunctionLayout.vue";
-import ControlButton from "../button/ControlButton.vue";
 import SvgIcon from "../SvgIcon.vue";
 
 export default {
     components: {
         FunctionLayout,
-        ControlButton,
         SvgIcon,
     },
     data() {
@@ -51,7 +49,7 @@ export default {
         },
     },
     computed: {
-        statusColor() {
+        statusColor(): string {
             return this.status ? "green" : "red";
         },
     },
@@ -64,8 +62,6 @@ export default {
     background-position: right bottom;
     background-repeat: no-repeat;
     background-size: auto 100%;
-    min-width: 300px;
-    max-width: 300px;
 
     display: flex;
     flex-direction: column;

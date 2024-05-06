@@ -28,8 +28,8 @@ export default {
     display: flex;
     flex-direction: column;
 
-    height: auto;
-    width: auto;
+    width: 100%;
+    height: 100%;
 }
 #title {
     color: var(--el-color-black);

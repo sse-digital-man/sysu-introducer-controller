@@ -1,39 +1,59 @@
 <template>
     <div class="wrap">
         <div>
-            <span id="title"> {{ title }} </span>
+            <span id="title"> {{ info.alias }} </span>
             <el-divider />
-            <div id="status">状态: {{ statusLabel[status] }}</div>
+            <div id="info-wrap">状态: {{ statusLabel[info.status] }}</div>
+            <div id="info-wrap">类型: {{ info.kind }}</div>
         </div>
         <div>
-            <el-button style="float: right" color="var(--el-color-info-light-9)" circle>
-                <SvgIcon name="play" :size="24" color="green" />
-            </el-button>
+            <ModuleControlButton style="float: right" :status="info.status" :click="click" />
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import SvgIcon from "./SvgIcon.vue";
+import { PropType } from "vue";
 
-import { statusLabel } from "../info/status";
+import ModuleControlButton from "./ModuleControlButton.vue";
+
+import { moduleControlApi } from "../api";
+import { ModuleStatus, statusLabel } from "../info/status";
+import { ModuleInfo } from "../info/module";
 
 export default {
-    components: { SvgIcon },
+    components: { ModuleControlButton },
     props: {
-        title: {
-            type: String,
-            default: "标题",
-        },
-        status: {
-            type: Number,
-            default: 0,
+        info: {
+            type: Object as PropType<ModuleInfo>,
+            required: true,
         },
     },
     data() {
         return {
             statusLabel,
         };
+    },
+    methods: {
+        async click() {
+            switch (this.info.status) {
+                case ModuleStatus.Started:
+                    moduleControlApi.stopModule(this.info.name);
+                    break;
+                case ModuleStatus.Stopped:
+                    moduleControlApi.startModule(this.info.name);
+                    break;
+            }
+        },
+    },
+    mounted() {
+        window.ws.addEventListener("message", (event) => {
+            const data = JSON.parse(event.data);
+
+            if (data.name == this.info.name) {
+                this.info.status = data.status;
+            }
+        });
     },
 };
 </script>
@@ -46,9 +66,10 @@ export default {
     font-weight: bold;
     padding: 0;
 }
-#status {
+#info-wrap {
     color: var(--el-text-color-placeholder);
     font-size: 12px;
+    line-height: 150%;
 }
 .wrap {
     display: flex;
@@ -59,7 +80,7 @@ export default {
     box-sizing: border-box;
 
     height: 100%;
-    width: 180px;
+    width: 200px;
 
     border: 1px solid var(--el-border-color);
     border-radius: 15px;

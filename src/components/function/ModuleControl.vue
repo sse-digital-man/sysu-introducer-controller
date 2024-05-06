@@ -3,7 +3,11 @@
         <!-- <div style="overflow-x: scroll; width: auto"> -->
         <el-scrollbar style="s">
             <el-space size="large">
-                <ModuleControlCell v-for="module in modules" :title="module"></ModuleControlCell>
+                <ModuleControlCell
+                    v-if="modules.length > 0"
+                    v-for="module in modules"
+                    :info="module"
+                ></ModuleControlCell>
             </el-space>
         </el-scrollbar>
         <!-- </div> -->
@@ -14,6 +18,9 @@
 import FunctionLayout from "../layout/FunctionLayout.vue";
 import ModuleControlCell from "../ModuleControlCell.vue";
 
+import { moduleControlApi } from "../../api";
+import { ModuleInfo } from "../../info/module";
+
 export default {
     components: {
         FunctionLayout,
@@ -22,8 +29,17 @@ export default {
 
     data() {
         return {
-            modules: ["处理核心", "网络爬虫", "人物渲染器"],
+            modules: [] as ModuleInfo[],
         };
+    },
+    methods: {
+        async initModuleList() {
+            const response = await moduleControlApi.getControllableModuleList();
+            this.modules = response.info.list;
+        },
+    },
+    async mounted() {
+        await this.initModuleList();
     },
 };
 </script>

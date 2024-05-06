@@ -8,6 +8,7 @@ var routes = [
     },
     {
         path: "/",
+        redirect: "control",
         component: () => import("../views/Main.vue"),
 
         children: [

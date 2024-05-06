@@ -4,17 +4,21 @@ import { ModuleStatus } from "../info/status";
 
 const BOOTER = "booter";
 
+function getModuleApiUrl(name: string) {
+    return getApiUrl("module/" + name);
+}
+
 export const moduleControlApi = {
     startModule(name: string) {
-        let request = postRequest(getApiUrl(`module/${name}/start`), undefined);
+        let request = postRequest(getModuleApiUrl(`start/${name}`), undefined);
         axios(request);
     },
     stopModule(name: string) {
-        let request = postRequest(getApiUrl(`module/${name}/stop`), undefined);
+        let request = postRequest(getModuleApiUrl(`stop/${name}`), undefined);
         axios(request);
     },
     async getModuleStatus(name: string) {
-        let request = getRequest(getApiUrl(`module/${name}/status`), undefined);
+        let request = getRequest(getModuleApiUrl(`status/${name}`), undefined);
 
         return await axios(request)
             .then((resp) => {
@@ -38,5 +42,15 @@ export const moduleControlApi = {
     },
     async getStatus() {
         return await this.getModuleStatus(BOOTER);
+    },
+
+    async getControllableModuleList(with_booter: boolean = false) {
+        let request = getRequest(getModuleApiUrl(`list/controllable`), {
+            with_booter,
+        });
+
+        return await axios(request).then((resp) => {
+            return resp.data;
+        });
     },
 };

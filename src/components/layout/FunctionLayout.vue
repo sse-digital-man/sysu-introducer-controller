@@ -20,7 +20,7 @@ export default {
 #wrap {
     background: var(--el-color-white);
     border-radius: 15px;
-    padding: 15px;
+    padding: 25px;
     box-sizing: border-box;
 
     font-size: 16px;

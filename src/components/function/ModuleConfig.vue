@@ -99,20 +99,26 @@
 </template>
 
 <script lang="ts">
-import FunctionLayout from "../layout/FunctionLayout.vue";
-
-import { ModuleInfo } from "../../info/module";
-import { ModuleStatus, statusLabel } from "../../info/status";
-import { moduleControlApi } from "../../api";
 import { ElMessageBox } from "element-plus";
 
+import FunctionLayout from "../layout/FunctionLayout.vue";
+
+import { useModuleStore } from "../../store";
+import { moduleControlApi } from "../../api";
+import { ModuleInfo } from "../../info/module";
+import { ModuleStatus, statusLabel } from "../../info/status";
+
 export default {
+    setup() {
+        return {
+            moduleStore: useModuleStore(),
+        };
+    },
     components: {
         FunctionLayout,
     },
     data() {
         return {
-            list: [] as ModuleInfo[],
             statusLabel,
 
             // 配置相关
@@ -222,8 +228,10 @@ export default {
             return status == ModuleStatus.NotLoaded || status == ModuleStatus.Stopped;
         },
     },
-    async mounted() {
-        await this.initList();
+    computed: {
+        list() {
+            return this.moduleStore.moduleList;
+        },
     },
 };
 </script>

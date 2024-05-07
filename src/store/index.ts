@@ -6,8 +6,26 @@ import { ModuleStatus } from "../info/status";
 export const useModuleStore = defineStore("modules", {
     state: () => {
         return {
-            modules: new Map<string, ModuleInfo>(),
+            modules: new Map<string, ModuleInfo>() as Map<string, ModuleInfo>,
         };
+    },
+    getters: {
+        controllableModuleList() {
+            const list = [] as ModuleInfo[];
+
+            const booterInfo = this.modules.get("booter");
+            if (booterInfo == undefined) return list;
+
+            for (let module of booterInfo.modules) {
+                const subInfo = this.modules.get(module);
+                if (subInfo != undefined) list.push(subInfo);
+            }
+
+            return list;
+        },
+        moduleList(): ModuleInfo[] {
+            return Array.from(this.modules.values());
+        },
     },
     actions: {
         initModule(modules: ModuleInfo[]) {

@@ -20,25 +20,19 @@ import { InfoFilled } from "@element-plus/icons-vue";
 import FunctionLayout from "../layout/FunctionLayout.vue";
 import ModuleControlCell from "../ModuleControlCell.vue";
 
-import { moduleControlApi } from "../../api";
-import { ModuleInfo } from "../../info/module";
+import { useModuleStore } from "../../store";
 
 export default {
-    components: { InfoFilled, FunctionLayout, ModuleControlCell },
-
-    data() {
+    setup() {
         return {
-            modules: [] as ModuleInfo[],
+            moduleStore: useModuleStore(),
         };
     },
-    methods: {
-        async initModuleList() {
-            const resp = await moduleControlApi.getControllableModuleList();
-            this.modules = resp.data.list;
+    components: { InfoFilled, FunctionLayout, ModuleControlCell },
+    computed: {
+        modules() {
+            return this.moduleStore.controllableModuleList;
         },
-    },
-    async mounted() {
-        await this.initModuleList();
     },
 };
 </script>

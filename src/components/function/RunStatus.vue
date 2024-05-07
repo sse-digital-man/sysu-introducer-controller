@@ -56,7 +56,7 @@ export default {
         },
         async initStatus() {
             const resp = await moduleControlApi.getStatus();
-            this.status = resp.info.status;
+            this.status = resp.data.status;
         },
     },
     async mounted() {

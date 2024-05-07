@@ -33,8 +33,8 @@ export default {
     },
     methods: {
         async initModuleList() {
-            const response = await moduleControlApi.getControllableModuleList();
-            this.modules = response.info.list;
+            const resp = await moduleControlApi.getControllableModuleList();
+            this.modules = resp.data.list;
         },
     },
     async mounted() {

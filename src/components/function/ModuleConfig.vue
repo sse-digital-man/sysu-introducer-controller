@@ -11,23 +11,44 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="alias" label="别名" min-width="120px"></el-table-column>
-                <el-table-column prop="kind" label="实现类型"> </el-table-column>
+                <el-table-column prop="kind" label="实现类型" min-width="100px">
+                    <!-- 在表格内切换实现类型-->
+                    <template #default="scope">
+                        <!-- Basic 类型不能进行切换 -->
+                        <span v-if="scope.row.kind == 'basic'"> {{ scope.row.kind }}</span>
+                        <el-select
+                            v-model="scope.row.kind"
+                            v-else
+                            :disabled="!checkCanChange(scope.row.status)"
+                            @change="toChangeModuleKind(scope.row)"
+                            @focus="config.previousKind = scope.row.kind"
+                            placeholder="请选择实现类型"
+                        >
+                            <el-option v-for="kind in scope.row.kinds" :key="kind" :value="kind"></el-option>
+                        </el-select>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="status" label="状态">
                     <template #default="scope">
                         {{ statusLabel[scope.row.status] }}
                     </template>
                 </el-table-column>
+
+                <!-- 操作栏 -->
                 <el-table-column label="操作">
                     <template #default="scope">
-                        <el-button type="primary" size="small" @click="toConfigModule(scope.row.name)" text
-                            >配置</el-button
-                        >
+                        <div style="display: flex; justify-content: center">
+                            <!-- 如果实现类型为空 则不能配置 -->
+                            <el-button type="info" size="small" @click="toConfigModule(scope.row)" link>
+                                配置
+                            </el-button>
+                        </div>
                     </template>
                 </el-table-column>
             </el-table>
         </FunctionLayout>
 
-        <el-dialog title="配置" v-model="config.visible" style="border-radius: 10px">
+        <el-dialog title="配置" v-model="config.visible">
             <div style="display: flex; flex-direction: column">
                 <el-form label-width="auto" label-suffix=": ">
                     <!-- 选择实现类型 -->
@@ -38,7 +59,7 @@
                             @change="refreshConfigInfoCopy"
                             :disabled="config.isEditing"
                         >
-                            <el-option v-for="kind in config.kinds" :key="kind" :value="kind"></el-option>
+                            <el-option v-for="kind in config.info.kinds" :key="kind" :value="kind"></el-option>
                         </el-select>
                     </el-form-item>
 
@@ -55,7 +76,7 @@
                             <!-- 数字类型 -->
                             <el-input
                                 :disabled="!config.isEditing"
-                                v-if="config.infoTypeMap[key] == 'number'"
+                                v-else-if="config.infoTypeMap[key] == 'number'"
                                 v-model.number="config.infoCopy[key]"
                                 :type="config.infoTypeMap[key]"
                             ></el-input>
@@ -81,7 +102,7 @@
 import FunctionLayout from "../layout/FunctionLayout.vue";
 
 import { ModuleInfo } from "../../info/module";
-import { statusLabel } from "../../info/status";
+import { ModuleStatus, statusLabel } from "../../info/status";
 import { moduleControlApi } from "../../api";
 import { ElMessageBox } from "element-plus";
 
@@ -96,48 +117,70 @@ export default {
 
             // 配置相关
             config: {
-                name: "",
                 visible: false,
-                kinds: [],
+                info: {} as ModuleInfo,
                 list: {} as any,
-                selectKind: undefined as undefined | string,
-                isEditing: false,
 
+                // 与编辑配置有关
+                selectKind: undefined as undefined | string,
                 infoCopy: {} as any,
                 infoTypeMap: {} as any,
+                isEditing: false,
+
+                // 与切换有关
+                previousKind: "",
             },
         };
     },
     methods: {
         async initList() {
             const resp = await moduleControlApi.getAllModuleList();
-            this.list = resp.info.list;
+            this.list = resp.data.list;
         },
 
-        async toConfigModule(name: string) {
-            const resp = await moduleControlApi.getModuleConfig(name);
+        async toConfigModule(info: ModuleInfo) {
+            const resp = await moduleControlApi.getModuleConfig(info.name);
 
+            // 返回为空说明无配置内容
             if (resp == undefined) {
+                ElMessageBox.alert("该模块无配置内容", "提示", {
+                    confirmButtonText: "确定",
+                });
                 return;
             }
 
             Object.assign(this.config, {
-                name: name,
+                info: info,
                 visible: true,
-                kinds: resp.info.kinds,
-                list: resp.info.config,
+                isEditing: false,
+                changeKind: info.kind,
+                list: resp.data.config,
             });
-
-            console.log(this.config.kinds);
         },
+        async toChangeModuleKind(info: ModuleInfo) {
+            if (info.kind == this.config.previousKind) return;
 
+            const newKind = info.kind;
+            info.kind = this.config.previousKind;
+
+            ElMessageBox.alert("你确定要切换模块实现类型吗？", "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                showCancelButton: true,
+            })
+                .then(async () => {
+                    await moduleControlApi.changeModuleKind(info.name, newKind);
+                    info.kind = newKind;
+                })
+                .catch(() => {});
+        },
         toOkInConfig() {
             const config = this.config;
 
             if (config.isEditing) {
                 console.log(config.infoCopy, config.infoTypeMap);
                 if (config.selectKind != undefined)
-                    moduleControlApi.updateModuleConfig(config.name, config.selectKind, config.infoCopy);
+                    moduleControlApi.updateModuleConfig(config.info.name, config.selectKind, config.infoCopy);
             }
 
             this.config.isEditing = !this.config.isEditing;
@@ -159,7 +202,6 @@ export default {
                 config.selectKind = undefined;
             }
         },
-
         refreshConfigInfoCopy() {
             const config = this.config;
 
@@ -176,9 +218,18 @@ export default {
                 config.infoTypeMap = infoTypeMap;
             }
         },
+        checkCanChange(status: ModuleStatus) {
+            return status == ModuleStatus.NotLoaded || status == ModuleStatus.Stopped;
+        },
     },
     async mounted() {
         await this.initList();
     },
 };
 </script>
+
+<style>
+.el-dialog {
+    border-radius: 10px;
+}
+</style>

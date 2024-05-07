@@ -1,8 +1,9 @@
 import { ModuleStatus } from "./status";
 
 export interface ModuleInfo {
-    kind: string;
-    alias: string;
     name: string;
+    alias: string;
+    kind: string;
+    kinds: string[];
     status: ModuleStatus;
 }

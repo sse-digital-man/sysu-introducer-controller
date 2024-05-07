@@ -82,4 +82,12 @@ export const moduleControlApi = {
 
         axios(request);
     },
+
+    async changeModuleKind(name: string, kind: string) {
+        let request = putRequest(getModuleApiUrl(`change/${name}`), {
+            kind: kind,
+        });
+
+        await axios(request);
+    },
 };

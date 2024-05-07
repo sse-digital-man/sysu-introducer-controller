@@ -6,4 +6,5 @@ export interface ModuleInfo {
     kind: string;
     kinds: string[];
     status: ModuleStatus;
+    modules: string[];
 }

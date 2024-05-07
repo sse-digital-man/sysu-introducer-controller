@@ -18,12 +18,35 @@ import ModuleControl from "../../components/function/ModuleControl.vue";
 import ModuleConfig from "../../components/function/ModuleConfig.vue";
 import LogDisplay from "../../components/function/LogDisplay.vue";
 
+import { moduleControlApi } from "../../api";
+import { useModuleStore } from "../../store";
+
+import { ModuleLogKind } from "../../info/log";
+
 export default {
+    setup() {
+        return {
+            moduleStore: useModuleStore(),
+        };
+    },
     components: {
         RunStatus,
         ModuleControl,
         ModuleConfig,
         LogDisplay,
+    },
+    async created() {
+        // 初始化全局模块信息表
+        const modules = await moduleControlApi.getAllModuleList();
+        this.moduleStore.initModule(modules.data.list);
+
+        window.ws.addEventListener("message", (event) => {
+            const data = JSON.parse(event.data);
+
+            if (data.kind == ModuleLogKind.ModuleStatus) {
+                this.moduleStore.updateModuleStatus(data.name, data.status);
+            }
+        });
     },
 };
 </script>

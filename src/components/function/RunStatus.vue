@@ -8,8 +8,8 @@
                 <span style="margin-left: 8px" :style="{ color: statusColor }">{{ status ? "运行中" : "停止中" }}</span>
             </div> -->
             <div class="control-wrap">
-                <ModuleControlButton :status="status" :click="click"></ModuleControlButton>
-                <span>{{ statusLabel[status] }}</span>
+                <ModuleControlButton :status="booterInfo.status" :click="click"></ModuleControlButton>
+                <span>{{ statusLabel[booterInfo.status] }}</span>
             </div>
             <!-- <div class="control-wrap">
                     <el-button color="var(--el-color-info-light-5)" circle>
@@ -28,8 +28,14 @@ import ModuleControlButton from "../ModuleControlButton.vue";
 
 import { statusLabel, ModuleStatus } from "../../info/status";
 import { moduleControlApi } from "../../api/module";
+import { useModuleStore } from "../../store";
 
 export default {
+    setup() {
+        return {
+            moduleStore: useModuleStore(),
+        };
+    },
     components: {
         FunctionLayout,
         ModuleControlButton,
@@ -37,7 +43,6 @@ export default {
     data() {
         return {
             curRole: "中小大",
-            status: ModuleStatus.NotConnected,
             url: new URL("../../assets/image.png", import.meta.url).href,
 
             statusLabel,
@@ -45,7 +50,7 @@ export default {
     },
     methods: {
         click() {
-            switch (this.status) {
+            switch (this.booterInfo.status) {
                 case ModuleStatus.Stopped:
                     moduleControlApi.boot();
                     break;
@@ -54,18 +59,15 @@ export default {
                     break;
             }
         },
-        async initStatus() {
-            const resp = await moduleControlApi.getStatus();
-            this.status = resp.data.status;
-        },
     },
-    async mounted() {
-        window.ws.addEventListener("message", (event) => {
-            const data = JSON.parse(event.data);
-            if (data.name == "booter") this.status = data["status"];
-        });
-        //初始化更新当前状态
-        await this.initStatus();
+    computed: {
+        booterInfo() {
+            const info = this.moduleStore.modules.get("booter");
+            if (info == undefined) {
+                return { status: ModuleStatus.NotConnected };
+            }
+            return info;
+        },
     },
 };
 </script>

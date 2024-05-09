@@ -17,10 +17,10 @@
 <script lang="ts">
 import { InfoFilled } from "@element-plus/icons-vue";
 
-import FunctionLayout from "../layout/FunctionLayout.vue";
-import ModuleControlCell from "../ModuleControlCell.vue";
+import FunctionLayout from "@/components/layout/FunctionLayout.vue";
+import ModuleControlCell from "@/components/ModuleControlCell.vue";
 
-import { useModuleStore } from "../../store";
+import { useModuleStore } from "@/store";
 
 export default {
     setup() {

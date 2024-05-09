@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import FunctionLayout from "../layout/FunctionLayout.vue";
+import FunctionLayout from "@/components/layout/FunctionLayout.vue";
 
 export default {
     components: {

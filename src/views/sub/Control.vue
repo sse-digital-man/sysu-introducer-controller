@@ -13,10 +13,10 @@
 </template>
 
 <script lang="ts">
-import RunStatus from "../../components/function/RunStatus.vue";
-import ModuleControl from "../../components/function/ModuleControl.vue";
-import ModuleConfig from "../../components/function/ModuleConfig.vue";
-import LogDisplay from "../../components/function/LogDisplay.vue";
+import RunStatus from "@/components/function/config/RunStatus.vue";
+import ModuleControl from "@/components/function/config/ModuleControl.vue";
+import ModuleConfig from "@/components/function/config/ModuleConfig.vue";
+import LogDisplay from "@/components/function/config/LogDisplay.vue";
 
 import { moduleControlApi } from "../../api";
 import { useModuleStore } from "../../store";

@@ -3,6 +3,9 @@ import vue from "@vitejs/plugin-vue";
 
 import svgLoader from "vite-svg-loader";
 
+import path from "path";
+
+// @: https://blog.csdn.net/qq_61402485/article/details/131619797
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [vue(), svgLoader()],
@@ -15,5 +18,13 @@ export default defineConfig({
                 rewrite: (path) => path.replace(/^\/api/, ""),
             },
         },
+    },
+    resolve: {
+        alias: [
+            {
+                find: "@",
+                replacement: path.resolve(__dirname, "./src"),
+            },
+        ],
     },
 });

@@ -107,12 +107,12 @@
 <script lang="ts">
 import { ElMessageBox } from "element-plus";
 
-import FunctionLayout from "../layout/FunctionLayout.vue";
+import FunctionLayout from "@/components/layout/FunctionLayout.vue";
 
-import { useModuleStore } from "../../store";
-import { moduleControlApi } from "../../api";
-import { ModuleInfo } from "../../info/module";
-import { ModuleStatus, statusLabel } from "../../info/status";
+import { useModuleStore } from "@/store";
+import { moduleControlApi } from "@/api";
+import { ModuleInfo } from "@/info/module";
+import { ModuleStatus, statusLabel } from "@/info/status";
 
 export default {
     setup() {

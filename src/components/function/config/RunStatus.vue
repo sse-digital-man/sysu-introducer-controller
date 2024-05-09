@@ -23,12 +23,12 @@
 </template>
 
 <script lang="ts">
-import FunctionLayout from "../layout/FunctionLayout.vue";
-import ModuleControlButton from "../ModuleControlButton.vue";
+import FunctionLayout from "@/components/layout/FunctionLayout.vue";
+import ModuleControlButton from "@/components/ModuleControlButton.vue";
 
-import { statusLabel, ModuleStatus } from "../../info/status";
-import { moduleControlApi } from "../../api/module";
-import { useModuleStore } from "../../store";
+import { statusLabel, ModuleStatus } from "@/info/status";
+import { moduleControlApi } from "@/api/module";
+import { useModuleStore } from "@/store";
 
 export default {
     setup() {

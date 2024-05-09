@@ -37,12 +37,18 @@
                 <!-- 操作栏 -->
                 <el-table-column label="操作">
                     <template #default="scope">
-                        <div style="display: flex; justify-content: center">
-                            <!-- 如果实现类型为空 则不能配置 -->
-                            <el-button type="info" size="small" @click="toConfigModule(scope.row)" link>
-                                配置
-                            </el-button>
-                        </div>
+                        <!-- <div style="display: flex; justify-content: center"> -->
+                        <!-- 如果实现类型为空 则不能配置 -->
+                        <el-button
+                            :disabled="!checkCanChange(scope.row.status)"
+                            type="info"
+                            size="small"
+                            @click="toConfigModule(scope.row)"
+                            link
+                        >
+                            配置
+                        </el-button>
+                        <!-- </div> -->
                     </template>
                 </el-table-column>
             </el-table>

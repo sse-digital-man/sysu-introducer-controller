@@ -2,6 +2,7 @@ import { defineStore, createPinia } from "pinia";
 
 import { ModuleInfo } from "../info/module";
 import { ModuleStatus } from "../info/status";
+import { HistoryMessage } from "@/info/message";
 
 export const useModuleStore = defineStore("modules", {
     state: () => {
@@ -41,6 +42,29 @@ export const useModuleStore = defineStore("modules", {
             const info = this.modules.get(name);
             if (info == undefined) return;
             info.status = status;
+        },
+    },
+});
+
+export const useMessageStore = defineStore("messages", {
+    state: () => {
+        return {
+            historyMessages: [
+                {
+                    role: "user",
+                    content: "介绍一下自己",
+                },
+                {
+                    role: "assistant",
+                    content: "你好，我是中大介绍官中小大",
+                },
+            ] as HistoryMessage[],
+        };
+    },
+    actions: {
+        appendHistoryMessage(role: "user" | "assistant", content: string) {
+            console.log(role, content);
+            this.historyMessages.push({ role, content });
         },
     },
 });

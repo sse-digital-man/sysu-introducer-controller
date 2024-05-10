@@ -36,7 +36,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .el-menu {
     /* 去掉有右边界线 */
     border-right: 0 !important;
@@ -44,13 +44,6 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-}
-#title {
-    color: var(--el-color-white);
-    text-align: center;
-    font-size: 24px;
-    padding: 15px;
-    padding-bottom: 20px;
 }
 #main-wrap {
     background-color: var(--el-bg-color-page);

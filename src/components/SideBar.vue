@@ -52,3 +52,13 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+#title {
+    color: var(--el-color-white);
+    text-align: center;
+    font-size: 24px;
+    padding: 15px;
+    padding-bottom: 20px;
+}
+</style>

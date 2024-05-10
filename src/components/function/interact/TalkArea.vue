@@ -8,7 +8,7 @@
                         <el-icon v-if="message.role == 'user'" size="20px"><User /></el-icon>
                         <el-image
                             v-else-if="message.role == 'assistant'"
-                            style="border-radius: 50%"
+                            style="border-radius: 50%; width: 32px; height: 32px"
                             :src="avatarUrl"
                         ></el-image>
                     </div>
@@ -18,7 +18,7 @@
             <!-- 操作区域 -->
             <div id="operation-wrap">
                 <el-input v-model="input" placeholder="输入文本发送消息" size="large"></el-input>
-                <el-button circle type="primary" style="margin-left: 15px">
+                <el-button circle type="primary" style="margin-left: 15px" @click="toSend()">
                     <el-icon size="24px"> <Right /></el-icon>
                 </el-button>
             </div>
@@ -29,10 +29,18 @@
 <script lang="ts">
 import { User, Right } from "@element-plus/icons-vue";
 
-import { getUrl } from "@/utils";
 import FunctionLayout from "@/components/layout/FunctionLayout.vue";
+import { getUrl } from "@/utils";
+import { useMessageStore } from "@/store";
+import { USER } from "@/info/message";
+import { interactApi } from "@/api";
 
 export default {
+    setup() {
+        return {
+            messageStore: useMessageStore(),
+        };
+    },
     components: {
         User,
         Right,
@@ -40,19 +48,26 @@ export default {
     },
     data() {
         return {
-            input: "",
+            input: "你好",
             avatarUrl: getUrl("avatar.png"),
-            messages: [
-                {
-                    role: "user",
-                    content: "介绍一下自己",
-                },
-                {
-                    role: "assistant",
-                    content: "你好，我是中大介绍官中小大",
-                },
-            ],
         };
+    },
+    computed: {
+        messages() {
+            return this.messageStore.historyMessages;
+        },
+    },
+    methods: {
+        toSend() {
+            const content = this.input.trim();
+
+            if (content.length > 0) {
+                this.messageStore.appendHistoryMessage(USER, this.input);
+                interactApi.endMessage(content);
+            }
+
+            this.input = "";
+        },
     },
 };
 </script>

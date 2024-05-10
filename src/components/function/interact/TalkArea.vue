@@ -29,8 +29,9 @@
 <script lang="ts">
 import { User, Right } from "@element-plus/icons-vue";
 
+import avatarUrl from "@/assets/avatar.png";
+
 import FunctionLayout from "@/components/layout/FunctionLayout.vue";
-import { getUrl } from "@/utils";
 import { useMessageStore } from "@/store";
 import { USER } from "@/info/message";
 import { interactApi } from "@/api";
@@ -49,7 +50,7 @@ export default {
     data() {
         return {
             input: "你好",
-            avatarUrl: getUrl("avatar.png"),
+            avatarUrl,
         };
     },
     computed: {

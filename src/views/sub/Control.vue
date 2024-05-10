@@ -13,41 +13,19 @@
 </template>
 
 <script lang="ts">
-import RunStatus from "@/components/function/config/RunStatus.vue";
-import ModuleControl from "@/components/function/config/ModuleControl.vue";
-import ModuleConfig from "@/components/function/config/ModuleConfig.vue";
-import LogDisplay from "@/components/function/config/LogDisplay.vue";
-
-import { moduleControlApi } from "../../api";
-import { useModuleStore } from "../../store";
-
-import { ModuleLogKind } from "../../info/log";
+import RunStatus from "@/components/function/control/RunStatus.vue";
+import ModuleControl from "@/components/function/control/ModuleControl.vue";
+import ModuleConfig from "@/components/function/control/ModuleConfig.vue";
+import LogDisplay from "@/components/function/control/LogDisplay.vue";
 
 export default {
-    setup() {
-        return {
-            moduleStore: useModuleStore(),
-        };
-    },
     components: {
         RunStatus,
         ModuleControl,
         ModuleConfig,
         LogDisplay,
     },
-    async created() {
-        // 初始化全局模块信息表
-        const modules = await moduleControlApi.getAllModuleList();
-        this.moduleStore.initModule(modules.data.list);
-
-        window.ws.addEventListener("message", (event) => {
-            const data = JSON.parse(event.data);
-
-            if (data.kind == ModuleLogKind.ModuleStatus) {
-                this.moduleStore.updateModuleStatus(data.name, data.status);
-            }
-        });
-    },
+    async created() {},
 };
 </script>
 

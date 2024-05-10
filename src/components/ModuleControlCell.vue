@@ -46,15 +46,6 @@ export default {
             }
         },
     },
-    mounted() {
-        window.ws.addEventListener("message", (event) => {
-            const data = JSON.parse(event.data);
-
-            if (data.name == this.info.name) {
-                this.info.status = data.status;
-            }
-        });
-    },
 };
 </script>
 

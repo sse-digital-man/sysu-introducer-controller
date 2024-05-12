@@ -9,6 +9,9 @@ import path from "path";
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [vue(), svgLoader()],
+    build: {
+        outDir: "static",
+    },
     server: {
         port: 8080,
         proxy: {

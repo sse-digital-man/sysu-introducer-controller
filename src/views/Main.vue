@@ -41,7 +41,7 @@ export default {
     methods: {},
     async created() {
         // 进入主界面的时候 将 websocket 挂载在 window 上
-        const ws = new WebSocket("ws://127.0.0.1:8083");
+        const ws = new WebSocket(`ws://${location.hostname}:8083`);
         ws.onopen = () => console.log("connected");
 
         ws.onmessage = (event) => {

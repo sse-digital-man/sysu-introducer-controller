@@ -46,18 +46,19 @@ export default {
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-
-            const kind = data.kind,
+            
+            const logKind = data.logKind,
                 content = data.content;
 
-            switch (kind) {
+            switch (logKind) {
                 case ModuleLogKind.Message:
                     if (content.kind == MessageKind.Assistant && content.toAdmin) {
                         this.messageStore.appendHistoryMessage(ASSISTANT, content.content);
                     }
                     break;
                 case ModuleLogKind.ModuleStatus:
-                    this.moduleStore.updateModuleStatus(content.name, content.status);
+                    
+                    this.moduleStore.updateModuleStatus(data.name, content.status);
                     break;
             }
         };

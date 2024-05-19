@@ -66,6 +66,10 @@ export default {
                     icon = Play;
                     break;
                 case ModuleStatus.NotConnected:
+                case ModuleStatus.NotLoaded:
+                case ModuleStatus.StartError:
+                case ModuleStatus.RunError:
+                case ModuleStatus.StopError:
                     color = "red";
                     icon = X;
                     disabled = true;

@@ -30,7 +30,7 @@
                 </el-table-column>
                 <el-table-column prop="status" label="状态">
                     <template #default="scope">
-                        {{ statusLabel[scope.row.status] }}
+                        {{ statusLabel.get(scope.row.status) }}
                     </template>
                 </el-table-column>
 

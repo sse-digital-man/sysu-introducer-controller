@@ -9,7 +9,7 @@
             </div> -->
             <div class="control-wrap">
                 <ModuleControlButton :status="booterInfo.status" :click="click"></ModuleControlButton>
-                <span>{{ statusLabel[booterInfo.status] }}</span>
+                <span>{{ statusLabel.get(booterInfo.status) }}</span>
             </div>
             <!-- <div class="control-wrap">
                     <el-button color="var(--el-color-info-light-5)" circle>

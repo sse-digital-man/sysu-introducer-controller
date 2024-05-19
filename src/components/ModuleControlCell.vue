@@ -3,7 +3,7 @@
         <div>
             <span id="title"> {{ info.alias }} </span>
             <el-divider />
-            <div id="info-wrap">状态: {{ statusLabel[info.status] }}</div>
+            <div id="info-wrap">状态: {{ statusLabel.get(info.status) }}</div>
             <div id="info-wrap">类型: {{ info.kind }}</div>
         </div>
         <div>

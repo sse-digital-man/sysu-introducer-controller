@@ -3,6 +3,7 @@ import { defineStore, createPinia } from "pinia";
 import { ModuleInfo } from "../info/module";
 import { ModuleStatus } from "../info/status";
 import { HistoryMessage } from "@/info/message";
+import { ModuleLogKind } from "@/info/log";
 
 export const useModuleStore = defineStore("modules", {
     state: () => {
@@ -68,6 +69,22 @@ export const useMessageStore = defineStore("messages", {
         },
     },
 });
+
+export const useLogStore = defineStore("log", {
+    state: () => {
+        return {
+            log: [
+            ] as {time: string; logKind: ModuleLogKind, content: string}[]
+        }
+    },
+    actions: {
+        appendLog(time: string, logKind: ModuleLogKind,  content: string) {
+            this.log.push({
+                time, content, logKind
+            })
+        }
+    }
+})
 
 const store = createPinia();
 

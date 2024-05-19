@@ -17,7 +17,7 @@ import { moduleControlApi } from "@/api";
 
 import { ModuleLogKind } from "@/info/log";
 import { ASSISTANT, MessageKind } from "@/info/message";
-import { useMessageStore, useModuleStore } from "@/store";
+import { useLogStore, useMessageStore, useModuleStore } from "@/store";
 
 export default {
     components: {
@@ -27,6 +27,7 @@ export default {
         return {
             messageStore: useMessageStore(),
             moduleStore: useModuleStore(),
+            logStore: useLogStore()
         };
     },
     data() {
@@ -46,7 +47,6 @@ export default {
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            
             const logKind = data.logKind,
                 content = data.content;
 
@@ -56,11 +56,33 @@ export default {
                         this.messageStore.appendHistoryMessage(ASSISTANT, content.content);
                     }
                     break;
-                case ModuleLogKind.ModuleStatus:
-                    
+                case ModuleLogKind.Status:
                     this.moduleStore.updateModuleStatus(data.name, content.status);
                     break;
             }
+            
+            // 生成显示的日志记录
+            let logContent: string | undefined = undefined;
+            switch(logKind) {
+                case ModuleLogKind.Message:
+                    switch(content.kind) {
+                        case MessageKind.Watcher:
+                            logContent = `接收到消息: ${content.content}`
+                            break
+                        case MessageKind.Assistant:
+                            logContent = `数字人回答: ${content.content}`
+                            break
+                        default:
+                            logContent = ""
+                    }
+                    break;
+                case ModuleLogKind.Handle:
+                    logContent = `${data.name}(${data.kind}) 处理完成，花费 ${content.time}s`
+                    break;
+            }
+
+            if(logContent != undefined)
+                this.logStore.appendLog(data.time, logKind, logContent)
         };
 
         // 初始化全局模块信息表

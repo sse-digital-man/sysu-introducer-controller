@@ -7,27 +7,13 @@
             >
                 <el-table-column prop="name" label="名称">
                     <template #default="scope">
-                        <span style="font-weight: bold"> {{ scope.row.name }}</span>
+                        <span style="font-weight: bold; color: var(--el-color-primary)">
+                            {{ toUpperAtFirst(scope.row.name) }}</span
+                        >
                     </template>
                 </el-table-column>
                 <el-table-column prop="alias" label="别名" min-width="120px"></el-table-column>
-                <el-table-column prop="kind" label="实现类型" min-width="100px">
-                    <!-- 在表格内切换实现类型-->
-                    <template #default="scope">
-                        <!-- Basic 类型不能进行切换 -->
-                        <span v-if="scope.row.kind == 'basic'"> {{ scope.row.kind }}</span>
-                        <el-select
-                            v-model="scope.row.kind"
-                            v-else
-                            :disabled="!checkCanChange(scope.row.status)"
-                            @change="toChangeModuleKind(scope.row)"
-                            @focus="config.previousKind = scope.row.kind"
-                            placeholder="请选择实现类型"
-                        >
-                            <el-option v-for="kind in scope.row.kinds" :key="kind" :value="kind"></el-option>
-                        </el-select>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="kind" label="实现类型"></el-table-column>
                 <el-table-column prop="status" label="状态">
                     <template #default="scope">
                         {{ statusLabel.get(scope.row.status) }}
@@ -62,7 +48,8 @@
                         <el-select
                             v-model="config.selectKind"
                             placeholder="请选择实现类型"
-                            @change="refreshConfigInfoCopy"
+                            @change="toChangeModuleKind(config.selectKind)"
+                            @focus="config.previousKind = config.info.kind"
                             :disabled="config.isEditing"
                         >
                             <el-option v-for="kind in config.info.kinds" :key="kind" :value="kind"></el-option>
@@ -107,6 +94,8 @@
 <script lang="ts">
 import { ElMessageBox } from "element-plus";
 
+import { toUpperAtFirst } from "@/utils";
+
 import FunctionLayout from "@/components/layout/FunctionLayout.vue";
 
 import { useModuleStore } from "@/store";
@@ -134,7 +123,7 @@ export default {
                 list: {} as any,
 
                 // 与编辑配置有关
-                selectKind: undefined as undefined | string,
+                selectKind: "" as string,
                 infoCopy: {} as any,
                 infoTypeMap: {} as any,
                 isEditing: false,
@@ -142,6 +131,8 @@ export default {
                 // 与切换有关
                 previousKind: "",
             },
+
+            toUpperAtFirst,
         };
     },
     methods: {
@@ -163,34 +154,42 @@ export default {
 
             Object.assign(this.config, {
                 info: info,
+                selectKind: info.kind,
                 visible: true,
                 isEditing: false,
                 changeKind: info.kind,
                 list: resp.data.config,
             });
+
+            this.refreshConfigInfoCopy();
         },
-        async toChangeModuleKind(info: ModuleInfo) {
-            if (info.kind == this.config.previousKind) return;
+        // 切换模块的实现类型
+        async toChangeModuleKind(newKind: string) {
+            if (newKind == this.config.previousKind) return;
 
-            const newKind = info.kind;
-            info.kind = this.config.previousKind;
-
+            const info = this.config.info;
             ElMessageBox.alert("你确定要切换模块实现类型吗？", "提示", {
                 confirmButtonText: "确定",
                 cancelButtonText: "取消",
                 showCancelButton: true,
             })
                 .then(async () => {
+                    // 确认切换时，调用 API 切换，并修改实现类型
                     await moduleControlApi.changeModuleKind(info.name, newKind);
                     info.kind = newKind;
+
+                    // 刷新配置信息
+                    this.refreshConfigInfoCopy();
                 })
-                .catch(() => {});
+                .catch(() => {
+                    // 复原实现类型
+                    this.config.selectKind = this.config.previousKind;
+                });
         },
         toOkInConfig() {
             const config = this.config;
 
             if (config.isEditing) {
-                console.log(config.infoCopy, config.infoTypeMap);
                 if (config.selectKind != undefined)
                     moduleControlApi.updateModuleConfig(config.info.name, config.selectKind, config.infoCopy);
             }
@@ -211,24 +210,23 @@ export default {
                 });
             } else {
                 config.visible = false;
-                config.selectKind = undefined;
+                config.selectKind = "";
             }
         },
+        // Copy 模块的配置信息，作为配置信息的修改副本
         refreshConfigInfoCopy() {
             const config = this.config;
 
-            if (config.selectKind != undefined) {
-                // 存储配置信息
-                config.infoCopy = {} as any;
-                Object.assign(config.infoCopy, config.list[config.selectKind]);
+            // 存储配置信息
+            config.infoCopy = {} as any;
+            Object.assign(config.infoCopy, config.list[config.selectKind]);
 
-                // 存储原始类型
-                let infoTypeMap = {} as any;
-                for (let [key, value] of Object.entries(config.infoCopy)) {
-                    infoTypeMap[key] = typeof value;
-                }
-                config.infoTypeMap = infoTypeMap;
+            // 存储原始类型
+            let infoTypeMap = {} as any;
+            for (let [key, value] of Object.entries(config.infoCopy)) {
+                infoTypeMap[key] = typeof value;
             }
+            config.infoTypeMap = infoTypeMap;
         },
         checkCanChange(status: ModuleStatus) {
             return status == ModuleStatus.NotLoaded || status == ModuleStatus.Stopped;

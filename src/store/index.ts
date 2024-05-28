@@ -1,14 +1,12 @@
 import { defineStore, createPinia } from "pinia";
 
-import { ModuleInfo } from "../info/module";
-import { ModuleStatus } from "../info/status";
-import { HistoryMessage } from "@/info/message";
-import { ModuleLogKind } from "@/info/log";
+import { ModuleInfo, ModuleStatus, ModuleConfigItem, ModuleLogKind, HistoryMessage } from "@/info";
 
 export const useModuleStore = defineStore("modules", {
     state: () => {
         return {
             modules: new Map<string, ModuleInfo>() as Map<string, ModuleInfo>,
+            config: new Map() as Map<string, Map<string, Map<string, ModuleConfigItem>>>,
         };
     },
     getters: {
@@ -28,6 +26,15 @@ export const useModuleStore = defineStore("modules", {
         moduleList(): ModuleInfo[] {
             return Array.from(this.modules.values());
         },
+
+        getModuleInstantConfig() {
+            return (name: string, kind: string) => {
+                const moduleConfig = this.config.get(name) as Map<string, Map<string, ModuleConfigItem>>;
+                if (moduleConfig == undefined) return undefined;
+
+                return moduleConfig.get(kind);
+            };
+        },
     },
     actions: {
         initModule(modules: ModuleInfo[]) {
@@ -36,8 +43,21 @@ export const useModuleStore = defineStore("modules", {
                 moduleMap.set(module.name, module);
             }
             this.modules = moduleMap;
+        },
+        initUserConfig(config: any) {
+            for (let [name, module] of Object.entries(config)) {
+                const moduleConfigMap = new Map<string, Map<string, ModuleConfigItem>>();
 
-            console.log(moduleMap);
+                for (let [kind, instant] of Object.entries(module as any)) {
+                    const instantConfigMap = new Map<string, ModuleConfigItem>();
+
+                    for (let [field, content] of Object.entries(instant as any)) {
+                        instantConfigMap.set(field, content as ModuleConfigItem);
+                    }
+                    moduleConfigMap.set(kind, instantConfigMap);
+                }
+                this.config.set(name, moduleConfigMap);
+            }
         },
         updateModuleStatus(name: string, status: ModuleStatus) {
             const info = this.modules.get(name);
@@ -73,18 +93,19 @@ export const useMessageStore = defineStore("messages", {
 export const useLogStore = defineStore("log", {
     state: () => {
         return {
-            log: [
-            ] as {time: string; logKind: ModuleLogKind, content: string}[]
-        }
+            log: [] as { time: string; logKind: ModuleLogKind; content: string }[],
+        };
     },
     actions: {
-        appendLog(time: string, logKind: ModuleLogKind,  content: string) {
+        appendLog(time: string, logKind: ModuleLogKind, content: string) {
             this.log.push({
-                time, content, logKind
-            })
-        }
-    }
-})
+                time,
+                content,
+                logKind,
+            });
+        },
+    },
+});
 
 const store = createPinia();
 

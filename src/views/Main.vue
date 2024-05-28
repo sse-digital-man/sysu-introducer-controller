@@ -27,7 +27,7 @@ export default {
         return {
             messageStore: useMessageStore(),
             moduleStore: useModuleStore(),
-            logStore: useLogStore()
+            logStore: useLogStore(),
         };
     },
     data() {
@@ -60,36 +60,33 @@ export default {
                     this.moduleStore.updateModuleStatus(data.name, content.status);
                     break;
             }
-            
+
             // 生成显示的日志记录
             let logContent: string | undefined = undefined;
-            switch(logKind) {
+            switch (logKind) {
                 case ModuleLogKind.Message:
-                    switch(content.kind) {
+                    switch (content.kind) {
                         case MessageKind.Watcher:
-                            logContent = `接收到消息: ${content.content}`
-                            break
+                            logContent = `接收到消息: ${content.content}`;
+                            break;
                         case MessageKind.Assistant:
-                            logContent = `数字人回答: ${content.content}`
-                            break
+                            logContent = `数字人回答: ${content.content}`;
+                            break;
                         default:
-                            logContent = ""
+                            logContent = "";
                     }
                     break;
                 case ModuleLogKind.Handle:
-                    logContent = `${data.name}(${data.kind}) 处理完成，花费 ${content.time}s`
+                    logContent = `${data.name}(${data.kind}) 处理完成，花费 ${content.time}s`;
                     break;
             }
 
-            if(logContent != undefined)
-                this.logStore.appendLog(data.time, logKind, logContent)
+            if (logContent != undefined) this.logStore.appendLog(data.time, logKind, logContent);
         };
 
         // 初始化全局模块信息表
-        const modules = await moduleControlApi.getAllModuleList();
-        this.moduleStore.initModule(modules.data.list);
-
-        // window.ws.addEventListener("message", this.events);
+        this.moduleStore.initModule((await moduleControlApi.getAllModuleList()).data.list);
+        this.moduleStore.initUserConfig((await moduleControlApi.getAllModuleConfigList()).data.list);
     },
 };
 </script>

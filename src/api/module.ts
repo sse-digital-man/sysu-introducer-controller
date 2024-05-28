@@ -62,6 +62,15 @@ export const moduleControlApi = {
         });
     },
 
+    // 获取用户可以编辑的所有配置信息
+    async getAllModuleConfigList() {
+        let request = getRequest(getModuleApiUrl(`config/all`), undefined);
+
+        return await axios(request).then((resp) => {
+            return resp.data;
+        });
+    },
+
     async getModuleConfig(name: string) {
         let request = getRequest(getModuleApiUrl(`config/${name}`), undefined);
 

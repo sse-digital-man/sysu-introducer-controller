@@ -1,5 +1,5 @@
 <template>
-    <el-dialog title="配置内容" v-model="isVisible">
+    <el-dialog title="配置内容" v-model="isVisible" :before-close="toClose">
         <div style="display: flex; flex-direction: column">
             <el-form label-width="auto" label-suffix=": ">
                 <!-- 选择实现类型 -->
@@ -62,9 +62,10 @@ import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
 
 import { ModuleInfo } from "@/info/module";
 import { moduleControlApi } from "@/api";
-import { PropType } from "vue";
+import { isVNode, PropType } from "vue";
 import { useModuleStore } from "@/store";
 import { ModuleConfigItem } from "@/info";
+import { isVisible } from "element-plus/es/utils/index.mjs";
 
 export default {
     setup() {
@@ -136,8 +137,7 @@ export default {
         },
         toOkInConfig() {
             if (this.isEditing) {
-                if (this.selectKind != undefined)
-                    moduleControlApi.updateModuleConfig(this.info.name, this.selectKind, this.configValueCopy);
+                moduleControlApi.updateModuleConfig(this.info.name, this.selectKind, this.configValueCopy);
             }
 
             this.isEditing = !this.isEditing;
@@ -152,18 +152,21 @@ export default {
                     this.refreshConfigInfoCopy();
                     this.isEditing = false;
                 });
-            } else {
-                this.selectKind = "";
             }
         },
-        convertConfigInfo(config: any): any {
-            const result = Object.entries(config)
-                .filter(([key, _label]) => key.startsWith("#"))
-                .map(([key, label]) => [key.slice(1), label]);
+        // 关闭 Dialog 之前的验证内容
+        async toClose(done: Function) {
+            let close = true;
 
-            console.log(this, result);
+            if (this.isEditing) {
+                await ElMessageBox.alert("退出后修改记录将不会被保存，你确定要退出吗？", "提示", {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    showCancelButton: true,
+                }).catch(() => (close = false));
+            }
 
-            return result;
+            if (close) done();
         },
         // Copy 模块的配置信息，作为配置信息的修改副本
         refreshConfigInfoCopy() {

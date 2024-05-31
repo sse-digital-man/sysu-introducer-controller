@@ -62,7 +62,7 @@ import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
 
 import { ModuleInfo } from "@/info/module";
 import { moduleControlApi } from "@/api";
-import { isVNode, PropType } from "vue";
+import { PropType } from "vue";
 import { useModuleStore } from "@/store";
 import { ModuleConfigItem } from "@/info";
 import { isVisible } from "element-plus/es/utils/index.mjs";
@@ -95,7 +95,7 @@ export default {
             configValueCopy: {} as any,
 
             // 与切换有关
-            previousKind: "",
+            previousKind: "" as string,
         };
     },
     // 每次打开 Dialog 时刷新内容
@@ -126,6 +126,10 @@ export default {
                     // 确认切换时，调用 API 切换，并修改实现类型
                     await moduleControlApi.changeModuleKind(info.name, newKind);
                     info.kind = newKind;
+                    this.configMap = this.moduleStore.getModuleInstantConfig(this.info.name, this.info.kind);
+
+                    // Notice: 避免切换
+                    this.previousKind = newKind;
 
                     // 刷新配置信息
                     this.refreshConfigInfoCopy();
@@ -170,7 +174,10 @@ export default {
         },
         // Copy 模块的配置信息，作为配置信息的修改副本
         refreshConfigInfoCopy() {
-            if (this.configMap == undefined) return;
+            if (this.configMap == undefined) {
+                this.configValueCopy = undefined;
+                return;
+            }
 
             // 存储配置信息
             const configValueCopy = {} as any;

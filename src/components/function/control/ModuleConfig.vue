@@ -132,7 +132,7 @@ export default {
     },
     data() {
         return {
-            curTab: "docker" as " module" | "docker",
+            curTab: "module" as " module" | "docker",
             // 1. 模块 配置相关
             moduleStatusLabel,
 

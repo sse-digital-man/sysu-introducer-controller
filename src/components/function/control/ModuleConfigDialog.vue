@@ -15,42 +15,39 @@
                     </el-select>
                 </el-form-item>
             </el-form>
-            <el-tabs type="border-card">
-                <el-tab-pane label="模块">
-                    <div v-if="configMap != undefined">
-                        <el-form label-width="auto" label-suffix=": ">
-                            <!-- 编辑配置信息 -->
-                            <el-form-item v-for="[key, content] in configMap.entries()" :label="content.label">
-                                <!-- 布尔类型 -->
-                                <el-switch
-                                    :disabled="!isEditing"
-                                    v-if="content.type == 'boolean'"
-                                    v-model="configValueCopy[key]"
-                                />
-                                <!-- 数字类型 -->
-                                <el-input
-                                    :readonly="!isEditing"
-                                    v-else-if="content.type == 'number'"
-                                    v-model.number="configValueCopy[key]"
-                                    :type="content.type"
-                                ></el-input>
-                                <!-- 字符串类型 -->
-                                <el-input :readonly="!isEditing" v-else v-model="configValueCopy[key]"></el-input>
-                            </el-form-item>
-                        </el-form>
+            <div v-if="configMap != undefined">
+                <el-divider style="margin: 0 0 20px 0"></el-divider>
 
-                        <div style="text-align: right">
-                            <el-button @click="toCancelInConfig()" v-if="isEditing"> 取消 </el-button>
-                            <el-button type="primary" @click="toOkInConfig()" :disabled="selectKind == undefined">
-                                {{ isEditing ? "保存" : "编辑" }}
-                            </el-button>
-                        </div>
-                    </div>
+                <el-form label-width="auto" label-suffix=": ">
+                    <!-- 编辑配置信息 -->
+                    <el-form-item v-for="[key, content] in configMap.entries()" :label="content.label">
+                        <!-- 布尔类型 -->
+                        <el-switch
+                            :disabled="!isEditing"
+                            v-if="content.type == 'boolean'"
+                            v-model="configValueCopy[key]"
+                        />
+                        <!-- 数字类型 -->
+                        <el-input
+                            :readonly="!isEditing"
+                            v-else-if="content.type == 'number'"
+                            v-model.number="configValueCopy[key]"
+                            :type="content.type"
+                        ></el-input>
+                        <!-- 字符串类型 -->
+                        <el-input :readonly="!isEditing" v-else v-model="configValueCopy[key]"></el-input>
+                    </el-form-item>
+                </el-form>
 
-                    <EmptyPlaceholder text="无配置信息" v-else />
-                </el-tab-pane>
-                <!-- <el-tab-pane label="Docker" v-if="containDocker()"> </el-tab-pane> -->
-            </el-tabs>
+                <div style="text-align: right">
+                    <el-button @click="toCancelInConfig()" v-if="isEditing"> 取消 </el-button>
+                    <el-button type="primary" @click="toOkInConfig()" :disabled="selectKind == undefined">
+                        {{ isEditing ? "保存" : "编辑" }}
+                    </el-button>
+                </div>
+            </div>
+
+            <EmptyPlaceholder text="无配置信息" v-else />
         </div>
     </el-dialog>
 </template>
@@ -58,14 +55,15 @@
 <script lang="ts">
 import { ElMessageBox } from "element-plus";
 
+import { PropType } from "vue";
+import { isVisible } from "element-plus/es/utils/index.mjs";
+
 import EmptyPlaceholder from "@/components/EmptyPlaceholder.vue";
 
+import { ModuleConfigItem } from "@/info/config";
 import { ModuleInfo } from "@/info/module";
 import { moduleControlApi } from "@/api";
-import { PropType } from "vue";
 import { useModuleStore } from "@/store";
-import { ModuleConfigItem } from "@/info";
-import { isVisible } from "element-plus/es/utils/index.mjs";
 
 export default {
     setup() {

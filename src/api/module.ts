@@ -1,12 +1,16 @@
 import axios from "axios";
 import { getApiUrl, getRequest, postRequest, putRequest } from "./utils";
-import { ModuleStatus } from "../info/status";
+import { ModuleStatus } from "../info/module";
 
 const BOOTER = "booter";
 
 function getModuleApiUrl(name: string) {
     return getApiUrl("module/" + name);
 }
+
+const getDockerContainerApiUrl = (name: string) => {
+    return getApiUrl("docker/container/" + name);
+};
 
 export const moduleControlApi = {
     startModule(name: string) {
@@ -98,5 +102,21 @@ export const moduleControlApi = {
         });
 
         await axios(request);
+    },
+
+    async getModuleDockerInfoList() {
+        let request = getRequest(getDockerContainerApiUrl(`list`), undefined);
+
+        return await axios(request).then((resp) => {
+            return resp.data;
+        });
+    },
+
+    async controlModuleDockerContainer(name: string, kind: string, cmd: "start" | "stop") {
+        let request = postRequest(getDockerContainerApiUrl(`${cmd}/${name}/${kind}`), undefined);
+
+        return await axios(request).then((resp) => {
+            return resp.data;
+        });
     },
 };

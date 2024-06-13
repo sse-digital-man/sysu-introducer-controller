@@ -1,6 +1,6 @@
 <template>
     <div class="col-wrap">
-        <div class="row-wrap" style="height: auto">
+        <div class="row-wrap" style="height: 30%; margin-bottom: 20px">
             <!-- Notice: 需要给两块地方单独设置一下占比 以解决宽度溢出的问题 -->
             <RunStatus style="width: 30%"></RunStatus>
             <ModuleControl style="width: 70%; margin-left: 20px"></ModuleControl>
@@ -39,6 +39,5 @@ export default {
 .row-wrap {
     display: flex;
     justify-content: space-between;
-    margin: 10px;
 }
 </style>

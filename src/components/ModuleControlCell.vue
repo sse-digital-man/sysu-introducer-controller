@@ -3,7 +3,7 @@
         <div>
             <span id="title"> {{ info.alias }} </span>
             <el-divider />
-            <div id="info-wrap">状态: {{ statusLabel.get(info.status) }}</div>
+            <div id="info-wrap">状态: {{ moduleStatusLabel.get(info.status) }}</div>
             <div id="info-wrap">类型: {{ info.kind }}</div>
         </div>
         <div>
@@ -18,7 +18,7 @@ import { PropType } from "vue";
 import ModuleControlButton from "./ModuleControlButton.vue";
 
 import { moduleControlApi } from "../api";
-import { ModuleStatus, statusLabel } from "../info/status";
+import { ModuleStatus, moduleStatusLabel } from "../info/module";
 import { ModuleInfo } from "../info/module";
 
 export default {
@@ -31,7 +31,7 @@ export default {
     },
     data() {
         return {
-            statusLabel,
+            moduleStatusLabel,
         };
     },
     methods: {

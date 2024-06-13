@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { ModuleStatus } from "../info/status";
+import { ModuleStatus } from "../info/module";
 import SvgIcon from "./SvgIcon.vue";
 
 import Play from "../assets/icons/play.svg?raw";

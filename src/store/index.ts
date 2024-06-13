@@ -1,6 +1,9 @@
 import { defineStore, createPinia } from "pinia";
 
-import { ModuleInfo, ModuleStatus, ModuleConfigItem, ModuleLogKind, HistoryMessage } from "@/info";
+import { ModuleInfo, ModuleStatus } from "@/info/module";
+import { ModuleConfigItem } from "@/info/config";
+import { ModuleLogKind } from "@/info/log";
+import { HistoryMessage } from "@/info/message";
 
 export const useModuleStore = defineStore("modules", {
     state: () => {
@@ -48,16 +51,18 @@ export const useModuleStore = defineStore("modules", {
             for (let [name, module] of Object.entries(config)) {
                 const moduleConfigMap = new Map<string, Map<string, ModuleConfigItem>>();
 
-                for (let [kind, instant] of Object.entries(module as any)) {
+                for (let [kind, instance] of Object.entries(module as any)) {
                     const instantConfigMap = new Map<string, ModuleConfigItem>();
 
-                    for (let [field, content] of Object.entries(instant as any)) {
+                    for (let [field, content] of Object.entries(instance as any)) {
                         instantConfigMap.set(field, content as ModuleConfigItem);
                     }
                     moduleConfigMap.set(kind, instantConfigMap);
                 }
                 this.config.set(name, moduleConfigMap);
             }
+
+            console.log(this.config);
         },
         updateModuleStatus(name: string, status: ModuleStatus) {
             const info = this.modules.get(name);

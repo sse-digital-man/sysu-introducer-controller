@@ -9,7 +9,7 @@
             </div> -->
             <div class="control-wrap">
                 <ModuleControlButton :status="booterInfo.status" :click="click"></ModuleControlButton>
-                <span>{{ statusLabel.get(booterInfo.status) }}</span>
+                <span>{{ moduleStatusLabel.get(booterInfo.status) }}</span>
             </div>
             <!-- <div class="control-wrap">
                     <el-button color="var(--el-color-info-light-5)" circle>
@@ -26,7 +26,7 @@
 import FunctionLayout from "@/components/layout/FunctionLayout.vue";
 import ModuleControlButton from "@/components/ModuleControlButton.vue";
 
-import { statusLabel, ModuleStatus } from "@/info/status";
+import { moduleStatusLabel, ModuleStatus } from "@/info/module";
 import { moduleControlApi } from "@/api/module";
 import { useModuleStore } from "@/store";
 
@@ -45,7 +45,7 @@ export default {
             curRole: "中小大",
             url: new URL("../../assets/image.png", import.meta.url).href,
 
-            statusLabel,
+            moduleStatusLabel,
         };
     },
     methods: {
@@ -82,6 +82,8 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
+    height: 100%;
 
     /* div {
         margin-top: 15px;

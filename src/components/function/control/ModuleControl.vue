@@ -6,7 +6,7 @@
                 <ModuleControlCell v-for="module in modules" :info="module"></ModuleControlCell>
             </el-space>
         </el-scrollbar>
-        <EmptyPlaceholder text="未加载模块" v-else></EmptyPlaceholder>
+        <EmptyPlaceholder text="未加载模块" style="height: 100%" v-else></EmptyPlaceholder>
         <!-- </div> -->
     </FunctionLayout>
 </template>

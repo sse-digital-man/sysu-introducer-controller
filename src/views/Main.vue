@@ -3,7 +3,7 @@
         <el-aside style="width: 200px">
             <SideBar title="数字人控制器" :menu-items="menuItems"></SideBar>
         </el-aside>
-        <el-main id="main-wrap">
+        <el-main id="main-wrap" v-loading="isLoading" v-if="!isLoading">
             <RouterView></RouterView>
         </el-main>
     </el-container>
@@ -37,10 +37,13 @@ export default {
                 { name: "interact", label: "消息交互", icon: Message },
                 { name: "config", label: "系统配置", icon: Setting },
             ],
+
+            isLoading: false,
         };
     },
-    methods: {},
-    async created() {
+    async mounted() {
+        this.isLoading = true;
+
         // 进入主界面的时候 将 websocket 挂载在 window 上
         const ws = new WebSocket(`ws://${location.hostname}:8083`);
         ws.onopen = () => console.log("connected");
@@ -85,8 +88,12 @@ export default {
         };
 
         // 初始化全局模块信息表
-        this.moduleStore.initModule((await moduleControlApi.getAllModuleList()).data.list);
-        this.moduleStore.initUserConfig((await moduleControlApi.getAllModuleConfigList()).data.list);
+        const result1 = await moduleControlApi.getAllModuleList(),
+            result2 = await moduleControlApi.getAllModuleTree();
+        this.moduleStore.initModule(result1.data.list, result2.data.tree);
+
+        // this.moduleStore.initUserConfig((await moduleControlApi.getAllModuleConfigList()).data.list);
+        this.isLoading = false;
     },
 };
 </script>

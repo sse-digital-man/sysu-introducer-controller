@@ -1,51 +1,63 @@
 import { defineStore, createPinia } from "pinia";
 
-import { ModuleInfo, ModuleStatus } from "@/info/module";
+import { ModuleInfo, ModuleTreeNode, ModuleStatus, toInfo } from "@/info/module";
 import { ModuleConfigItem } from "@/info/config";
 import { ModuleLogKind } from "@/info/log";
 import { HistoryMessage } from "@/info/message";
 
+const toInstanceLabel = (name: string, kind: string) => {
+    return `${name}_${kind}`;
+};
+
 export const useModuleStore = defineStore("modules", {
     state: () => {
         return {
-            modules: new Map<string, ModuleInfo>() as Map<string, ModuleInfo>,
+            modulesTree: undefined as ModuleTreeNode | undefined,
+            modulesList: new Map<string, ModuleInfo>(),
             config: new Map() as Map<string, Map<string, Map<string, ModuleConfigItem>>>,
         };
     },
     getters: {
-        controllableModuleList() {
-            const list = [] as ModuleInfo[];
-
-            const booterInfo = this.modules.get("booter");
-            if (booterInfo == undefined) return list;
-
-            for (let module of booterInfo.modules) {
-                const subInfo = this.modules.get(module);
-                if (subInfo != undefined) list.push(subInfo);
+        moduleList(): ModuleInfo[] {
+            return Array.from(this.modulesList.values());
+        },
+        moduleMap(): Map<string, ModuleInfo> {
+            return this.modulesList;
+        },
+        moduleTree(): ModuleTreeNode | undefined {
+            return this.modulesTree;
+        },
+        rootModule(): ModuleInfo | undefined {
+            if (this.modulesTree == undefined) {
+                return undefined;
             }
 
-            return list;
+            return toInfo(this.modulesTree);
         },
-        moduleList(): ModuleInfo[] {
-            return Array.from(this.modules.values());
+        controllableModuleList(): ModuleInfo[] {
+            const submodules = this.modulesTree != undefined ? this.modulesTree.modules : undefined;
+            if (submodules == undefined) {
+                return [];
+            }
+            return submodules.map((subModule) => toInfo(subModule));
         },
+        // getModuleInstantConfig() {
+        //     return (name: string, kind: string) => {
+        //         const moduleConfig = this.config.get(name) as Map<string, Map<string, ModuleConfigItem>>;
+        //         if (moduleConfig == undefined) return undefined;
 
-        getModuleInstantConfig() {
-            return (name: string, kind: string) => {
-                const moduleConfig = this.config.get(name) as Map<string, Map<string, ModuleConfigItem>>;
-                if (moduleConfig == undefined) return undefined;
-
-                return moduleConfig.get(kind);
-            };
-        },
+        //         return moduleConfig.get(kind);
+        //     };
+        // },
     },
     actions: {
-        initModule(modules: ModuleInfo[]) {
+        initModule(modules: ModuleInfo[], modulesTree: any) {
             const moduleMap = new Map<string, ModuleInfo>();
             for (let module of modules) {
-                moduleMap.set(module.name, module);
+                moduleMap.set(toInstanceLabel(module.name, module.kind), module);
             }
-            this.modules = moduleMap;
+            this.modulesList = moduleMap;
+            this.modulesTree = modulesTree;
         },
         initUserConfig(config: any) {
             for (let [name, module] of Object.entries(config)) {
@@ -61,11 +73,9 @@ export const useModuleStore = defineStore("modules", {
                 }
                 this.config.set(name, moduleConfigMap);
             }
-
-            console.log(this.config);
         },
         updateModuleStatus(name: string, status: ModuleStatus) {
-            const info = this.modules.get(name);
+            const info = this.moduleMap.get(name);
             if (info == undefined) return;
             info.status = status;
         },

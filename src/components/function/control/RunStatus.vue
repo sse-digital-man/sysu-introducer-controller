@@ -62,7 +62,7 @@ export default {
     },
     computed: {
         booterInfo() {
-            const info = this.moduleStore.modules.get("booter");
+            const info = this.moduleStore.rootModule;
             if (info == undefined) {
                 return { status: ModuleStatus.NotConnected };
             }

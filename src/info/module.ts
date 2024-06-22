@@ -2,10 +2,33 @@ export interface ModuleInfo {
     name: string;
     alias: string;
     kind: string;
-    kinds: string[];
     status: ModuleStatus;
     modules: string[];
 }
+
+export interface ModuleTreeNode {
+    name: string;
+    alias: string;
+    kind: string;
+    status: ModuleStatus;
+    modules: ModuleTreeNode[];
+}
+
+// modules 会嵌套很多内容，将 TreeNode 转换成 Info，可以节约内存开销
+export const toInfo = (node: ModuleTreeNode) => {
+    let info = {
+        name: node.name,
+        alias: node.alias,
+        kind: node.kind,
+        status: node.status,
+    } as ModuleInfo;
+
+    if (node.modules != undefined) {
+        info.modules = node.modules.map((subNode) => subNode.name);
+    }
+
+    return info;
+};
 
 export enum ModuleStatus {
     NotConnected = -1,

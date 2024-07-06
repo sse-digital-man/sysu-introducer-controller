@@ -32,14 +32,22 @@ export const useModuleStore = defineStore("modules", {
                 return undefined;
             }
 
-            return toInfo(this.modulesTree);
+            return this.modulesList.get(toInstanceLabel(this.modulesTree.name, this.modulesTree.kind));
         },
         controllableModuleList(): ModuleInfo[] {
+            let list = [] as ModuleInfo[];
+
             const submodules = this.modulesTree != undefined ? this.modulesTree.modules : undefined;
             if (submodules == undefined) {
-                return [];
+                return list;
             }
-            return submodules.map((subModule) => toInfo(subModule));
+
+            for (let node of submodules) {
+                const info = this.modulesList.get(toInstanceLabel(node.name, node.kind));
+                if (info != undefined) list.push(info);
+            }
+
+            return list;
         },
         // getModuleInstantConfig() {
         //     return (name: string, kind: string) => {
@@ -74,8 +82,9 @@ export const useModuleStore = defineStore("modules", {
                 this.config.set(name, moduleConfigMap);
             }
         },
-        updateModuleStatus(name: string, status: ModuleStatus) {
-            const info = this.moduleMap.get(name);
+        updateModuleStatus(name: string, kind: string, status: ModuleStatus) {
+            const info = this.moduleMap.get(toInstanceLabel(name, kind));
+
             if (info == undefined) return;
             info.status = status;
         },

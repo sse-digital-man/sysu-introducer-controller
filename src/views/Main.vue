@@ -60,7 +60,7 @@ export default {
                     }
                     break;
                 case ModuleLogKind.Status:
-                    this.moduleStore.updateModuleStatus(data.name, content.status);
+                    this.moduleStore.updateModuleStatus(data.name, data.kind, content.status);
                     break;
             }
 

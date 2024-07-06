@@ -1,6 +1,6 @@
 import { defineStore, createPinia } from "pinia";
 
-import { ModuleInfo, ModuleTreeNode, ModuleStatus, toInfo } from "@/info/module";
+import { ModuleInfo, ModuleTreeNode, ModuleStatus } from "@/info/module";
 import { ModuleConfigItem } from "@/info/config";
 import { ModuleLogKind } from "@/info/log";
 import { HistoryMessage } from "@/info/message";
@@ -49,14 +49,15 @@ export const useModuleStore = defineStore("modules", {
 
             return list;
         },
-        // getModuleInstantConfig() {
-        //     return (name: string, kind: string) => {
-        //         const moduleConfig = this.config.get(name) as Map<string, Map<string, ModuleConfigItem>>;
-        //         if (moduleConfig == undefined) return undefined;
+        // FIXME: 占位符号，防止报错
+        getModuleInstantConfig() {
+            return (name: string, kind: string) => {
+                const moduleConfig = this.config.get(name) as Map<string, Map<string, ModuleConfigItem>>;
+                if (moduleConfig == undefined) return undefined;
 
-        //         return moduleConfig.get(kind);
-        //     };
-        // },
+                return moduleConfig.get(kind);
+            };
+        },
     },
     actions: {
         initModule(modules: ModuleInfo[], modulesTree: any) {

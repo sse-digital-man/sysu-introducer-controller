@@ -4,7 +4,9 @@
             <el-form label-width="auto" label-suffix=": ">
                 <!-- 选择实现类型 -->
                 <el-form-item label="实现类型">
-                    <el-select
+                    <!-- 暂时未实现 -->
+                    <div>暂时未实现</div>
+                    <!-- <el-select
                         v-model="selectKind"
                         placeholder="请选择实现类型"
                         @change="toChangeModuleKind(selectKind)"
@@ -12,7 +14,7 @@
                         :disabled="isEditing"
                     >
                         <el-option v-for="kind in info.kinds" :key="kind" :value="kind"></el-option>
-                    </el-select>
+                    </el-select> -->
                 </el-form-item>
             </el-form>
             <div v-if="configMap != undefined">
